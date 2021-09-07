@@ -15,6 +15,7 @@ function init() {
 
     // Use the first sample from the list to build the initial plots
     var firstSample = sampleNames[0];
+    //console.log(firstSample)
     buildCharts(firstSample);
     buildMetadata(firstSample);
   });
@@ -63,15 +64,27 @@ function buildCharts(sample) {
     var resultArray = samplesArray.filter(sampleObj => sampleObj.id == sample); 
     //  5. Create a variable that holds the first sample in the array.
     var result = resultArray[0];
-
+    
     // 6. Create variables that hold the otu_ids, otu_labels, and sample_values.
     var otuIDs = result.otu_ids;
     var otuLabels = result.otu_labels;
     var sampleValues = result.sample_values;
 
-    //Create a variable that holds the washing frequency.
-    var washFreq = parseFloat(result.wfreq);
+    // 1. Create a variable that filters the metadata array for the object with the desired sample number.
+    var metadataArray = data.metadata;
+    var metaArray = metadataArray.filter(sampleObj => sampleObj.id == sample);
+    //console.log(metaArray)
 
+    // 2. Create a variable that holds the first sample in the metadata array.
+    
+    var meta = metaArray[0];
+    
+
+
+    // 3. Create a variable that holds the washing frequency.
+
+    var washFreq = parseFloat(meta.wfreq);
+    console.log(washFreq)
     // 7. Create the yticks for the bar chart.
     // Hint: Get the the top 10 otu_ids and map them in descending order  
     //  so the otu_ids with the most bacteria are last. 
@@ -80,9 +93,9 @@ function buildCharts(sample) {
 
     // 8. Create the trace for the bar chart. 
     var barData = [{ 
-      x: sampleValues,
+      x: sampleValues.slice(0,10).reverse(),
       y: yticks,
-      text: otuLabels,
+      text: otuLabels.slice(0,10).reverse(),
       type: "bar",
       orientation: "h"
     }];
@@ -100,8 +113,8 @@ function buildCharts(sample) {
       text: otuLabels,
       mode: 'markers',
       marker: {
-        color: [otuIDs],
-        size: [sampleValues]
+        color: otuIDs,
+        size: sampleValues
         // colorscale: ["plasma"]
       } 
       }];
@@ -124,7 +137,7 @@ function buildCharts(sample) {
      // 4. Create the trace for the gauge chart.
      var gaugeData = [{
       domain: { x: [0, 1], y: [0, 1] },
-      value: {washFreq},
+      value: washFreq,
       title: { text: "Belly Button Wash Frequency <br> Scrubs per Week" },
       type: "indicator",
       mode: "gauge+number",
